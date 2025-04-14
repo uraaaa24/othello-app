@@ -1,9 +1,9 @@
 'use client'
 
+import { BOARD_SIZE } from '@/constants/board'
+import { getFlippableDiscs } from '@/libs/utils'
 import { BoardState, Disc } from '@/types/othello'
 import { useState } from 'react'
-
-const BOARD_SIZE = 8
 
 const createInitialBoard = (): BoardState => {
   const board: BoardState = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
@@ -21,22 +21,21 @@ const Board = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Disc>('black')
 
   const handleClick = (x: number, y: number) => {
-    // 既に駒がある場合は無視
-    if (board[y][x] !== null) return
+    const flips = getFlippableDiscs(board, x, y, currentPlayer)
+    if (flips.length === 0) return
 
     const newBoard = board.map((row) => [...row])
     newBoard[y][x] = currentPlayer
-    setBoard(newBoard)
+    flips.forEach(([fx, fy]) => {
+      newBoard[fy][fx] = currentPlayer
+    })
 
-    // プレイヤー交代
+    setBoard(newBoard)
     setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
   }
 
   return (
     <div className="grid grid-cols-8 grid-rows-8 gap-0.5 border-2 border-neutral-800 bg-[var(--board-green)]">
-      {/* {Array.from({ length: 64 }).map((_, i) => (
-        <div key={i} className="w-12 h-12 bg-green-700 hover:bg-green-600 transition-colors" />
-      ))} */}
       {board.map((row, y) => {
         return row.map((cell, x) => {
           return (
