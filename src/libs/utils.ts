@@ -48,3 +48,17 @@ export const hasValidMoves = (board: BoardState, player: Disc): boolean => {
   }
   return false
 }
+
+export const countDiscs = (board: BoardState): { black: number; white: number } => {
+  let black = 0
+  let white = 0
+
+  for (const row of board) {
+    for (const cell of row) {
+      if (cell === 'black') black++
+      else if (cell === 'white') white++
+    }
+  }
+
+  return { black, white }
+}
