@@ -1,7 +1,7 @@
 'use client'
 
 import { BOARD_SIZE } from '@/constants/board'
-import { getFlippableDiscs } from '@/libs/utils'
+import { getFlippableDiscs, hasValidMoves } from '@/libs/utils'
 import { BoardState, Disc } from '@/types/othello'
 import { useState } from 'react'
 
@@ -30,8 +30,18 @@ const Board = () => {
       newBoard[fy][fx] = currentPlayer
     })
 
+    const nextPlayer = currentPlayer === 'black' ? 'white' : 'black'
+
+    if (hasValidMoves(newBoard, nextPlayer)) {
+      setCurrentPlayer(nextPlayer)
+    } else if (hasValidMoves(newBoard, currentPlayer)) {
+      // currentPlayerのまま（続投）
+      alert(`${nextPlayer}はパスです`)
+    } else {
+      alert('ゲーム終了！')
+    }
+
     setBoard(newBoard)
-    setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
   }
 
   return (

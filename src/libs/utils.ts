@@ -38,3 +38,13 @@ export const getFlippableDiscs = (
 
   return flippable
 }
+
+export const hasValidMoves = (board: BoardState, player: Disc): boolean => {
+  for (let y = 0; y < BOARD_SIZE; y++) {
+    for (let x = 0; x < BOARD_SIZE; x++) {
+      const flips = getFlippableDiscs(board, x, y, player)
+      if (flips.length > 0) return true
+    }
+  }
+  return false
+}
