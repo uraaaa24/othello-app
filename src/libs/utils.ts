@@ -1,64 +1,57 @@
 import { BOARD_SIZE, DIRECTIONS } from '@/constants/board'
-import { BoardState, Disc } from '@/types/othello'
+import { BoardStateType, DiscType } from '@/types/othello'
+
+const inBounds = (x: number, y: number) => x >= 0 && y >= 0 && x < BOARD_SIZE && y < BOARD_SIZE
 
 export const getFlippableDiscs = (
-  board: BoardState,
+  board: BoardStateType,
   x: number,
   y: number,
-  player: Disc
+  player: DiscType
 ): [number, number][] => {
-  const opponent: Disc = player === 'black' ? 'white' : 'black'
+  if (board[y][x] !== null) return []
+  const opponent: DiscType = player === 'black' ? 'white' : 'black'
   const flippable: [number, number][] = []
 
-  // 既に駒がある場合は無視
-  if (board[y][x] !== null) return []
-
-  for (const [dy, dx] of DIRECTIONS) {
+  for (const [dx, dy] of DIRECTIONS) {
     const path: [number, number][] = []
-    let nx = x + dx
-    let ny = y + dy
+    let step = 1
 
-    while (nx >= 0 && ny >= 0 && nx < BOARD_SIZE && ny < BOARD_SIZE && board[ny][nx] === opponent) {
-      path.push([nx, ny])
-      nx += dx
-      ny += dy
-    }
+    while (true) {
+      const nx = x + dx * step
+      const ny = y + dy * step
 
-    if (
-      path.length > 0 &&
-      nx >= 0 &&
-      ny >= 0 &&
-      nx < BOARD_SIZE &&
-      ny < BOARD_SIZE &&
-      board[ny][nx] === player
-    ) {
-      flippable.push(...path)
+      if (!inBounds(nx, ny) || board[ny][nx] === null) {
+        // 枠外か空マスに達したら打ち切り
+        break
+      }
+      if (board[ny][nx] === opponent) {
+        // 相手コマが続く限り path に追加
+        path.push([nx, ny])
+      } else {
+        // 自分コマにたどり着いたら path をひっくり返し対象に
+        if (path.length > 0 && board[ny][nx] === player) {
+          flippable.push(...path)
+        }
+        break
+      }
+      step++
     }
   }
 
   return flippable
 }
 
-export const hasValidMoves = (board: BoardState, player: Disc): boolean => {
-  for (let y = 0; y < BOARD_SIZE; y++) {
-    for (let x = 0; x < BOARD_SIZE; x++) {
-      const flips = getFlippableDiscs(board, x, y, player)
-      if (flips.length > 0) return true
-    }
-  }
-  return false
-}
+export const hasValidMoves = (board: BoardStateType, player: DiscType) =>
+  board.some((row, y) => row.some((_, x) => getFlippableDiscs(board, x, y, player).length > 0))
 
-export const countDiscs = (board: BoardState): { black: number; white: number } => {
-  let black = 0
-  let white = 0
-
-  for (const row of board) {
-    for (const cell of row) {
-      if (cell === 'black') black++
-      else if (cell === 'white') white++
-    }
-  }
-
-  return { black, white }
-}
+export const countDiscs = (board: BoardStateType) =>
+  board.reduce(
+    (acc, row) =>
+      row.reduce((c, cell) => {
+        if (cell === 'black') c.black++
+        if (cell === 'white') c.white++
+        return c
+      }, acc),
+    { black: 0, white: 0 }
+  )

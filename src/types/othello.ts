@@ -1,2 +1,2 @@
-export type Disc = 'black' | 'white' | null
-export type BoardState = Disc[][]
+export type DiscType = 'black' | 'white' | null
+export type BoardStateType = DiscType[][]
