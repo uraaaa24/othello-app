@@ -55,8 +55,8 @@ const Board = () => {
         <span>White: {white}</span>
       </div>
 
-      <div className="p-2 bg-green-400 rounded-lg">
-        <div className="grid grid-cols-8 grid-rows-8">
+      <div className="p-3 bg-green-400 rounded-lg">
+        <div className="grid grid-cols-8 grid-rows-8 border border-green-500">
           {board.map((row, y) =>
             row.map((cell, x) => (
               <button
